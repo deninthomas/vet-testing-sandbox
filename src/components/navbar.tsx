@@ -206,7 +206,7 @@ export default function Navbar() {
                 href="/volunteer"
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   pathname.startsWith('/volunteer')
-                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'
+                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-450'
                     : 'text-zinc-600 hover:text-emerald-600 dark:text-zinc-300 dark:hover:text-emerald-400'
                 }`}
               >
@@ -227,6 +227,21 @@ export default function Navbar() {
               >
                 <Shield className="w-4 h-4" />
                 Admin
+              </Link>
+            )}
+
+            {/* User Dashboard Access */}
+            {currentUser?.role === 'user' && (
+              <Link
+                href="/dashboard"
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  pathname.startsWith('/dashboard')
+                    ? 'bg-amber-50 text-amber-700 dark:bg-zinc-900 dark:text-amber-400'
+                    : 'text-zinc-600 hover:text-amber-600 dark:text-zinc-300 dark:hover:text-amber-400'
+                }`}
+              >
+                <Shield className="w-4 h-4" />
+                Dashboard
               </Link>
             )}
           </nav>
@@ -308,6 +323,15 @@ export default function Navbar() {
               className="block px-3 py-2 rounded-lg text-base font-medium text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-zinc-900"
             >
               Admin Dashboard
+            </Link>
+          )}
+          {currentUser?.role === 'user' && (
+            <Link
+              href="/dashboard"
+              onClick={() => setIsMenuOpen(false)}
+              className="block px-3 py-2 rounded-lg text-base font-medium text-amber-600 hover:bg-amber-55 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-zinc-900"
+            >
+              Dashboard
             </Link>
           )}
           <hr className="border-zinc-200 dark:border-zinc-800 my-2" />

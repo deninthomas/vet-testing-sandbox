@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import NotificationModal from '@/components/NotificationModal';
 
 export default function Register() {
   const router = useRouter();
@@ -13,6 +14,13 @@ export default function Register() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Modal States
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<'success' | 'error' | 'warning'>('success');
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+  const [onModalClose, setOnModalClose] = useState<(() => void) | undefined>(undefined);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,15 +43,31 @@ export default function Register() {
 
       if (!res.ok) {
         setError(data.error || 'Registration failed');
+        setModalType('error');
+        setModalTitle('Registration Failed');
+        setModalMessage(data.error || 'Registration failed. Please check your inputs.');
+        setModalOpen(true);
       } else {
-        setSuccess('Registration successful! Redirecting to login...');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1500);
+        setSuccess('Registration successful! Redirecting to dashboard...');
+        if (data.user) {
+          localStorage.setItem('tailwise_user', JSON.stringify(data.user));
+        }
+        setModalType('success');
+        setModalTitle('Registration Successful!');
+        setModalMessage('Your account was created successfully! Welcome to TailWise.');
+        setModalOpen(true);
+        setOnModalClose(() => () => {
+          router.push('/dashboard');
+          router.refresh();
+        });
       }
     } catch (err) {
       console.error(err);
       setError('Something went wrong. Please try again.');
+      setModalType('error');
+      setModalTitle('Connection Error');
+      setModalMessage('Could not connect to the registration service. Please check your internet and try again.');
+      setModalOpen(true);
     } finally {
       setLoading(false);
     }
@@ -94,7 +118,7 @@ export default function Register() {
 
           <div>
             <label htmlFor="email" className="block text-sm font-semibold mb-1.5">
-              Email Address (Accepts anything due to validation bug!)
+              Email Address *
             </label>
             {/* Note: type="text" instead of "email" is used to bypass browser default email checks! */}
             <input
@@ -123,7 +147,7 @@ export default function Register() {
 
           <div>
             <label htmlFor="password" className="block text-sm font-semibold mb-1.5">
-              Password (Accepts empty strings!)
+              Password *
             </label>
             <input
               id="password"
@@ -153,6 +177,19 @@ export default function Register() {
           </Link>
         </div>
       </div>
+
+      <NotificationModal
+        isOpen={modalOpen}
+        type={modalType}
+        title={modalTitle}
+        message={modalMessage}
+        onClose={() => {
+          setModalOpen(false);
+          if (onModalClose) {
+            onModalClose();
+          }
+        }}
+      />
     </div>
   );
 }

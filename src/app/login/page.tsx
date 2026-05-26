@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Shield } from 'lucide-react';
+import NotificationModal from '@/components/NotificationModal';
 
 export default function Login() {
   const router = useRouter();
@@ -11,6 +12,12 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Modal States
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<'success' | 'error' | 'warning'>('success');
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,14 +34,29 @@ export default function Login() {
 
       if (!res.ok) {
         setError(data.error || 'Invalid credentials');
+        setModalType('error');
+        setModalTitle('Login Failed');
+        setModalMessage(data.error || 'Invalid email or password. Please try again.');
+        setModalOpen(true);
       } else {
         localStorage.setItem('tailwise_user', JSON.stringify(data.user));
-        router.push('/');
+        const userRole = data.user?.role;
+        if (userRole === 'admin') {
+          router.push('/admin');
+        } else if (userRole === 'volunteer') {
+          router.push('/volunteer');
+        } else {
+          router.push('/dashboard');
+        }
         router.refresh();
       }
     } catch (err) {
       console.error(err);
       setError('Something went wrong. Please try again.');
+      setModalType('error');
+      setModalTitle('Connection Error');
+      setModalMessage('Could not connect to the login service. Please check your internet and try again.');
+      setModalOpen(true);
     } finally {
       setLoading(false);
     }
@@ -127,6 +149,14 @@ export default function Login() {
           </ul>
         </div>
       </div>
+
+      <NotificationModal
+        isOpen={modalOpen}
+        type={modalType}
+        title={modalTitle}
+        message={modalMessage}
+        onClose={() => setModalOpen(false)}
+      />
     </div>
   );
 }
