@@ -39,3 +39,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Agent / AI Helper Files
+CLAUDE.md
+AGENTS.md
+.gemini/
+*.log
+
+# Slides / Local Resources
+*.pptx
+*.pdf
+
+# Sandbox credentials
+credentials.md
+
+
