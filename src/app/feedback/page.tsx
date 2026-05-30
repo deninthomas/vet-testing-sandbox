@@ -150,7 +150,7 @@ export default function FeedbackPage() {
             <button
               type="submit"
               disabled={submitLoading}
-              className="w-full py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl text-xs transition duration-150 disabled:opacity-50 cursor-pointer shadow-md shadow-rose-500/10"
+              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition duration-150 disabled:opacity-50 cursor-pointer shadow-md shadow-emerald-500/10"
             >
               {submitLoading ? 'Sending...' : 'Submit Feedback'}
             </button>
