@@ -1,0 +1,1786 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "link and dummy data",
+    "version": "1.0.0",
+    "description": "TailWise QA Sandbox API Documentation. Contains mock endpoints, deliberate QA test bugs, and dummy data schemas."
+  },
+  "servers": [
+    {
+      "url": "/api",
+      "description": "Sandbox API Base URL"
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "summary": "User Login",
+        "description": "Authenticates a user against mock database or MongoDB. Note: Contains a deliberate QA case-insensitive password comparison bug.",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@tailwise.org"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "user123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Login",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/UserResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "summary": "Register User",
+        "description": "Registers a new user. Note: Contains deliberate QA bugs (email validation is bypassed, password lengths > 8 characters are silently truncated to 8).",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "email", "password"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "john_doe@example.com"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "example": "1234567890"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "mypass123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Registration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/UserResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Duplicate email or validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/users": {
+      "get": {
+        "summary": "Get All Users",
+        "description": "Retrieves list of all users. In MongoDB mode, password field is omitted.",
+        "tags": ["Authentication"],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/UserResponse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update User Role",
+        "description": "Updates a user's role. Note: Contains a deliberate target-mismatch QA bug where it always modifies the first user in the DB/array instead of the requested ID.",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["id", "role"],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "u1"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["user", "volunteer", "admin"],
+                    "example": "volunteer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Update",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/UserResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing inputs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User database is empty or not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete User",
+        "description": "Deletes a user by search query ID parameter.",
+        "tags": ["Authentication"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "description": "The unique User ID to delete",
+            "schema": {
+              "type": "string",
+              "example": "u_abc123"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Deletion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID parameter missing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/adoption": {
+      "get": {
+        "summary": "Get Adoption Board Animals",
+        "description": "Retrieves the list of animals available for adoption. Note: Contains a deliberate QA bug that lists all animals, including those already adopted.",
+        "tags": ["Adoption"],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "animals": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Animal"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Animal Listing",
+        "description": "Creates a new animal profile for adoption.",
+        "tags": ["Adoption"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "species"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Buddy"
+                  },
+                  "species": {
+                    "type": "string",
+                    "example": "Dog"
+                  },
+                  "breed": {
+                    "type": "string",
+                    "example": "Golden Retriever Mix"
+                  },
+                  "age": {
+                    "type": "string",
+                    "example": "2 years"
+                  },
+                  "healthStatus": {
+                    "type": "string",
+                    "example": "Healthy (Vaccinated)"
+                  },
+                  "temperament": {
+                    "type": "string",
+                    "example": "Friendly, playful, energetic"
+                  },
+                  "imageUrl": {
+                    "type": "string",
+                    "example": "https://images.unsplash.com/photo-1552053831-71594a27632d?w=600"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Animal created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "animal": {
+                      "$ref": "#/components/schemas/Animal"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing name or species",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/adoption/apply": {
+      "post": {
+        "summary": "Apply For Animal Adoption",
+        "description": "Submits an adoption application for a specific animal. Note: Contains deliberate QA bugs: allows dates in the past, and throws a simulated 500 NullPointerException crash if the animal's status is already 'adopted'.",
+        "tags": ["Adoption"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["animalId", "applicantName", "applicantPhone", "adoptionDate"],
+                "properties": {
+                  "animalId": {
+                    "type": "string",
+                    "example": "a1"
+                  },
+                  "applicantName": {
+                    "type": "string",
+                    "example": "Jane Doe"
+                  },
+                  "applicantPhone": {
+                    "type": "string",
+                    "example": "9990001111"
+                  },
+                  "adoptionDate": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2026-06-03"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Adoption request submitted and animal marked adopted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Adoption application received for Buddy!"
+                    },
+                    "animal": {
+                      "$ref": "#/components/schemas/Animal"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing inputs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Animal not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Simulated application crash (NullPointerException if animal already adopted) or server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "CRITICAL_CRASH: NullPointerException inside AnimalMatchingService. Match recommendations failed because animal is already bound to another owner account!"
+                    },
+                    "stack": {
+                      "type": "string",
+                      "example": "Error: CRITICAL_CRASH: NullPointerException inside AnimalMatchingService...\n    at POST (route.ts:39:15)..."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/donations": {
+      "get": {
+        "summary": "Get Donations",
+        "description": "Retrieves the historical donation log.",
+        "tags": ["Donations"],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "donations": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Donation"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Submit Donation",
+        "description": "Submits a donation for a specific cause. Note: Contains deliberate QA bugs: allows negative donation amounts, and mapping bug where cause 'General Welfare Fund' is saved as 'General Fund'.",
+        "tags": ["Donations"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["donorName", "amount", "cause"],
+                "properties": {
+                  "donorName": {
+                    "type": "string",
+                    "example": "Pam Beesly"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 50
+                  },
+                  "cause": {
+                    "type": "string",
+                    "example": "General Welfare Fund"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Donation successfully processed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "donation": {
+                      "$ref": "#/components/schemas/Donation"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feedback": {
+      "get": {
+        "summary": "Get Feedbacks",
+        "description": "Retrieves the list of feedback left by users.",
+        "tags": ["Feedback"],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "feedbacks": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Feedback"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Submit Feedback",
+        "description": "Submits feedback. Note: Contains deliberate QA bugs: accepting rating out of range [1-5], censors the word 'bad' to 'excellent', and throws a simulated server crash (500) if the comment contains the word 'crash'.",
+        "tags": ["Feedback"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userName", "comment"],
+                "properties": {
+                  "userName": {
+                    "type": "string",
+                    "example": "Dwight Schrute"
+                  },
+                  "comment": {
+                    "type": "string",
+                    "example": "This service is bad, I want to trigger a crash test."
+                  },
+                  "rating": {
+                    "type": "number",
+                    "example": 6
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Feedback submitted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "feedback": {
+                      "$ref": "#/components/schemas/Feedback"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing name or comment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Simulated server crash (if comment has 'crash') or internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "CRITICAL: NullPointerException at FeedbackCensorshipProcessor.java:42. String reference is null."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/incidents": {
+      "get": {
+        "summary": "Get Incidents",
+        "description": "Retrieves the list of reported emergency rescue incidents.",
+        "tags": ["Incidents"],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "incidents": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Incident"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Report Rescue Incident",
+        "description": "Reports a new stray animal in distress. Note: Contains deliberate QA bugs: swaps latitude and longitude parameters when storing, allows blank location text, and stores image string as corrupted placeholder if base64/url size exceeds 2MB (length > 500k chars).",
+        "tags": ["Incidents"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["reporterName", "reporterPhone", "animalType", "description"],
+                "properties": {
+                  "reporterName": {
+                    "type": "string",
+                    "example": "Sarah Jenkins"
+                  },
+                  "reporterPhone": {
+                    "type": "string",
+                    "example": "4445556666"
+                  },
+                  "animalType": {
+                    "type": "string",
+                    "example": "Cat"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Injured kitten trapped in a drainage pipe."
+                  },
+                  "location": {
+                    "type": "string",
+                    "example": "Main Street Corner, Boston"
+                  },
+                  "latitude": {
+                    "type": "number",
+                    "example": 42.3601
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "example": -71.0589
+                  },
+                  "imageUrl": {
+                    "type": "string",
+                    "example": "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Incident reported",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "incident": {
+                      "$ref": "#/components/schemas/Incident"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/incidents/resolve": {
+      "post": {
+        "summary": "Resolve Incident",
+        "description": "Marks an incident as resolved. Note: Contains a deliberate QA off-by-one bug where it resolves the NEXT incident in the list (index + 1) rather than the clicked one.",
+        "tags": ["Incidents"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["id"],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "i1"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Incident resolution triggered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Resolved incident of Dog at Central Park, NY (GPS: -71.0589, 42.3601) (requested: i1, actual resolved: i2)"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Incident ID missing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Incident not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/identify": {
+      "post": {
+        "summary": "AI/ML Animal Identification",
+        "description": "Classifies an animal image based on its filename. Note: Contains a deliberate classification rules bug (checks if the filename contains the letter 'd' to determine if it is a dog).",
+        "tags": ["Services"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["fileName"],
+                "properties": {
+                  "fileName": {
+                    "type": "string",
+                    "example": "dog_retriever.png"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Classification result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "species": {
+                      "type": "string",
+                      "example": "Dog"
+                    },
+                    "breed": {
+                      "type": "string",
+                      "example": "Golden Retriever"
+                    },
+                    "confidence": {
+                      "type": "number",
+                      "example": 0.92
+                    },
+                    "modelDetails": {
+                      "type": "string",
+                      "example": "MobileNetV3-TailWise Animal Classifier v1.2"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Filename missing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/log": {
+      "post": {
+        "summary": "Log Client Activity",
+        "description": "Accepts and logs user actions on the server console.",
+        "tags": ["Services"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["action"],
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "example": "BUTTON_CLICK_ADOPT_BOARD"
+                  },
+                  "details": {
+                    "type": "object",
+                    "example": {
+                      "buttonId": "adopt-btn-a1",
+                      "screen": "adoption"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logged successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/petShop": {
+      "get": {
+        "summary": "Search Pet Shop Products",
+        "description": "Retrieves the list of products matching a query. Note: Contains a deliberate case-sensitive search QA bug.",
+        "tags": ["Services"],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "description": "Case-sensitive query parameter to match products by name",
+            "schema": {
+              "type": "string",
+              "example": "Dog"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "products": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Product"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Pet Shop Checkout",
+        "description": "Performs checkout of cart products. Note: Contains a deliberate QA bug allowing negative quantities which increases stock and calculates a negative total price.",
+        "tags": ["Services"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["items"],
+                "properties": {
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["productId", "quantity"],
+                      "properties": {
+                        "productId": {
+                          "type": "string",
+                          "example": "p1"
+                        },
+                        "quantity": {
+                          "type": "number",
+                          "example": 2
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful checkout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Checkout successful!"
+                    },
+                    "totalPrice": {
+                      "type": "number",
+                      "example": 59.98
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "example": "Premium Dog Food"
+                          },
+                          "price": {
+                            "type": "number",
+                            "example": 29.99
+                          },
+                          "quantity": {
+                            "type": "number",
+                            "example": 2
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Empty cart items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/veterinary": {
+      "get": {
+        "summary": "Search Veterinary Clinics",
+        "description": "Searches vet clinics by city. Note: Selecting 'Suburbs' city will result in zero hospitals, triggering a deliberate client-side TypeError crash.",
+        "tags": ["Services"],
+        "parameters": [
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "description": "Filter clinics by city (case-insensitive regex)",
+            "schema": {
+              "type": "string",
+              "example": "Downtown"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "vets": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/VetHospital"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Book Vet Appointment",
+        "description": "Books an appointment. Note: Contains a deliberate target swap QA bug where it always schedules the appointment with the first clinic in the database regardless of the requested clinicId.",
+        "tags": ["Services"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["clinicId", "petName", "date", "time"],
+                "properties": {
+                  "clinicId": {
+                    "type": "string",
+                    "example": "v2"
+                  },
+                  "petName": {
+                    "type": "string",
+                    "example": "Luna"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "example": "Annual vaccines checkup"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2026-06-10"
+                  },
+                  "time": {
+                    "type": "string",
+                    "example": "10:30 AM"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Appointment successfully booked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Appointment successfully booked with City Animal Hospital!"
+                    },
+                    "appointment": {
+                      "$ref": "#/components/schemas/Appointment"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing inputs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reset": {
+      "post": {
+        "summary": "Reset Sandbox Database",
+        "description": "Restores mock database store variables to default seeded values.",
+        "tags": ["Services"],
+        "responses": {
+          "200": {
+            "description": "Database reset successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Database reset successfully"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "u1"
+          },
+          "name": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "user@tailwise.org"
+          },
+          "phone": {
+            "type": "string",
+            "example": "1234567890"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["user", "volunteer", "admin"],
+            "example": "user"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-02T22:00:00.000Z"
+          }
+        }
+      },
+      "Animal": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "a1"
+          },
+          "name": {
+            "type": "string",
+            "example": "Buddy"
+          },
+          "species": {
+            "type": "string",
+            "example": "Dog"
+          },
+          "breed": {
+            "type": "string",
+            "example": "Golden Retriever Mix"
+          },
+          "age": {
+            "type": "string",
+            "example": "2 years"
+          },
+          "healthStatus": {
+            "type": "string",
+            "example": "Healthy (Vaccinated)"
+          },
+          "temperament": {
+            "type": "string",
+            "example": "Friendly, playful, energetic"
+          },
+          "imageUrl": {
+            "type": "string",
+            "example": "https://images.unsplash.com/photo-1552053831-71594a27632d?w=600"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["available", "adopted"],
+            "example": "available"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-02T22:00:00.000Z"
+          }
+        }
+      },
+      "Donation": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "d1"
+          },
+          "donorName": {
+            "type": "string",
+            "example": "Robert Vance"
+          },
+          "amount": {
+            "type": "number",
+            "example": 100
+          },
+          "cause": {
+            "type": "string",
+            "example": "General Welfare Fund"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-01T22:00:00.000Z"
+          }
+        }
+      },
+      "Feedback": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "fb_123"
+          },
+          "userName": {
+            "type": "string",
+            "example": "Robert Vance"
+          },
+          "comment": {
+            "type": "string",
+            "example": "Great pet application platform! Very easy to use."
+          },
+          "rating": {
+            "type": "number",
+            "example": 5
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-02T22:05:00.000Z"
+          }
+        }
+      },
+      "Incident": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "i1"
+          },
+          "reporterName": {
+            "type": "string",
+            "example": "Mark Smith"
+          },
+          "reporterPhone": {
+            "type": "string",
+            "example": "1112223333"
+          },
+          "animalType": {
+            "type": "string",
+            "example": "Dog"
+          },
+          "description": {
+            "type": "string",
+            "example": "Stray dog with a broken front leg near Central Park."
+          },
+          "location": {
+            "type": "string",
+            "example": "Central Park, NY (GPS: -71.0589, 42.3601)"
+          },
+          "imageUrl": {
+            "type": "string",
+            "example": "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=600"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["reported", "rescued", "resolved"],
+            "example": "reported"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-02T20:00:00.000Z"
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "p1"
+          },
+          "name": {
+            "type": "string",
+            "example": "Premium Dog Food"
+          },
+          "price": {
+            "type": "number",
+            "example": 29.99
+          },
+          "description": {
+            "type": "string",
+            "example": "Nutritious high-protein kibble for active adult dogs."
+          },
+          "imageUrl": {
+            "type": "string",
+            "example": "https://images.unsplash.com/photo-1585499103188-5972f78a727f?w=600"
+          },
+          "shopName": {
+            "type": "string",
+            "example": "Happy Tails Shop"
+          },
+          "shopLocation": {
+            "type": "string",
+            "example": "Downtown"
+          },
+          "shopPhone": {
+            "type": "string",
+            "example": "9998887777"
+          },
+          "stock": {
+            "type": "number",
+            "example": 15
+          }
+        }
+      },
+      "VetHospital": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "v1"
+          },
+          "name": {
+            "type": "string",
+            "example": "City Animal Hospital"
+          },
+          "city": {
+            "type": "string",
+            "example": "Downtown"
+          },
+          "address": {
+            "type": "string",
+            "example": "123 Vet Blvd, Suite A"
+          },
+          "phone": {
+            "type": "string",
+            "example": "222-333-4444"
+          },
+          "specialty": {
+            "type": "string",
+            "example": "General practice & Surgery"
+          },
+          "rating": {
+            "type": "number",
+            "example": 4.8
+          }
+        }
+      },
+      "Appointment": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "appt_123"
+          },
+          "clinicId": {
+            "type": "string",
+            "example": "v1"
+          },
+          "clinicName": {
+            "type": "string",
+            "example": "City Animal Hospital"
+          },
+          "petName": {
+            "type": "string",
+            "example": "Luna"
+          },
+          "reason": {
+            "type": "string",
+            "example": "General checkup"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-06-10"
+          },
+          "time": {
+            "type": "string",
+            "example": "10:30 AM"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-02T22:15:00.000Z"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "Error message detailing what went wrong."
+          }
+        }
+      }
+    }
+  }
+}

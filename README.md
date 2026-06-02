@@ -1,5 +1,19 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## 📖 API Documentation
+
+We have set up an interactive Swagger API Documentation suite:
+- **Interactive Swagger UI Endpoint**: `/api/docs` (available locally at [http://localhost:3000/api/docs](http://localhost:3000/api/docs))
+- **OpenAPI 3.0 Specification File**: [link.json](file:///c:/Users/HP/Downloads/Testing/public/link.json) (available locally at [http://localhost:3000/link.json](http://localhost:3000/link.json))
+- **Full Documentation Guide**: [API_README.md](file:///c:/Users/HP/Downloads/Testing/API_README.md)
+- **Detailed Resource Specifications (Markdown)**:
+  - 🔐 [Authentication & Users](file:///c:/Users/HP/Downloads/Testing/docs/auth.md)
+  - 🐾 [Adoption Board](file:///c:/Users/HP/Downloads/Testing/docs/adoption.md)
+  - 🚨 [Emergency Rescue Incidents](file:///c:/Users/HP/Downloads/Testing/docs/incidents.md)
+  - 🛠️ [Services, Vet, PetShop & Auxiliary](file:///c:/Users/HP/Downloads/Testing/docs/services.md)
+
+---
+
 ## Getting Started
 
 First, run the development server:
