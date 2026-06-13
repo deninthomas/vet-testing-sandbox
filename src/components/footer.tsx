@@ -14,7 +14,7 @@ export default function Footer() {
               <span className="text-xs text-zinc-400">v1.0.0 (Testing Edition)</span>
             </div>
             <p className="text-xs text-zinc-400 mt-1">
-              SAINTGITS COLLEGE OF ENGINEERING (AUTONOMOUS) - COURSE CODE: 21CA406 - MAIN PROJECT
+              Stack Web Devlopment Team
             </p>
           </div>
           <div className="flex gap-6 text-sm">
