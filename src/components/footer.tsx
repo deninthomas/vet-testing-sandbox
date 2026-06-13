@@ -25,8 +25,8 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-zinc-200 dark:border-zinc-800/60 mt-6 pt-4 flex flex-col md:flex-row justify-between text-xs text-zinc-400 gap-2">
-          <span>&copy; {new Date().getFullYear()} TailWise. Developed by Sona Mariyam Shajee (Roll No. 54).</span>
-          <span>Designed under the guidance of Ms. Anithamol K.P.</span>
+          <span>&copy; {new Date().getFullYear()} TailWise. Developed by Denin.</span>
+          <span>Designed By Stackup Devlopment Team</span>
         </div>
       </div>
     </footer>
