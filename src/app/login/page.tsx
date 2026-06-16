@@ -143,9 +143,9 @@ export default function Login() {
           </div>
           <p className="text-zinc-500">You can use these default credentials to test user roles:</p>
           <ul className="list-disc list-inside mt-1 font-mono text-[11px] text-zinc-550 space-y-0.5">
-            <li>Admin: <span className="text-amber-600">admin@tailwise.org</span> / adminpassword</li>
-            <li>Volunteer: <span className="text-amber-600">volunteer@tailwise.org</span> / volunteerpassword</li>
-            <li>User: <span className="text-amber-600">user@tailwise.org</span> / userpassword</li>
+            <li>Admin: <span className="text-amber-600">admin@tailwise.org</span> / admin123</li>
+            <li>Volunteer: <span className="text-amber-600">volunteer@tailwise.org</span> / volunteer123</li>
+            <li>User: <span className="text-amber-600">user@tailwise.org</span> / user123</li>
           </ul>
         </div>
       </div>
